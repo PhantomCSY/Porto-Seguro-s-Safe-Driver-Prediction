@@ -61,6 +61,7 @@ train = combine[:train.shape[0]]
 test = combine[train.shape[0]:]
 test = test.drop('target', axis=1)
 
+# K-Fold Validation
 kf = KFold(n_splits=5, random_state=2017,shuffle=True)
 
 X_train = train.drop(['id', 'target'], axis=1)
@@ -86,7 +87,8 @@ for train_index, cv_index in kf.split(train):
 
     model = xgb.train(xgb_params, d_train, 5000, evals=watchlist, feval=normal_gini, maximize=True, early_stopping_rounds=100, verbose_eval=50)
     pred.append(model.predict(d_test))
-    
+
+# Averaging the predictions
 pred_avg = np.sum(np.asarray(pred), axis=0) / 5
 df = pd.DataFrame({'id': test.id, 'target': pred_avg})
 df.to_csv('result.csv', index=False)
